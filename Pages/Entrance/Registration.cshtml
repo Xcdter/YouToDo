@@ -1,0 +1,36 @@
+﻿@page
+@model YouToDo.Pages.Entrance.RegistrationModel
+@{
+    ViewData["Title"] = "Registration";
+}
+
+<head>
+    <title>Регистрация</title>
+</head>
+<body>
+    <h2>Регистрация</h2>
+    <p>Заполните все поля, чтобы создать новый аккаунт.</p>
+
+    <form action="" method="post">
+        <div class="form-group">
+            <label>Имя</label>
+            <input type="text" name="name" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Электронная почта</label>
+            <input type="email" name="email" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label>Пароль</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <label>Повторите пароль</label>
+            <input type="password" name="confirm_password" class="form-control" required>
+        </div>
+        <div class="form-group">
+            <input type="submit" name="submit" class="btn btn-primary" value="Зарегистрироваться">
+        </div>
+        <p>Уже зарегистрированы? <a href="Login">Войдите в систему</a>.</p>
+    </form>
+</body>
