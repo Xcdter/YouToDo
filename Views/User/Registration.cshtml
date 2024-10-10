@@ -1,0 +1,60 @@
+﻿
+@{
+    ViewData["Title"] = "Registration";
+}
+
+
+@*@{ 
+    Validation.RequireField("name", "You must enter a title");
+    Validation.RequireField("email", "Genre is required");
+    Validation.RequireField("password", "You haven't entered a year");
+
+    var name = "";
+    var email = "";
+    var password = "";
+    DateTime time = DateTime.Now;
+
+    if (IsPost && Validation.IsValid())
+    {
+        name = Request.Form["title"];
+        email = Request.Form["genre"];
+        password = Request.Form["year"];
+
+        var db = Database.Open("test_db");
+        var insertCommand = "INSERT INTO User (name, email, password, created_date) Values(@0, @1, @2, @3)";
+        db.Execute(insertCommand, name, email, password, time);
+        Response.Redirect("Index");
+    }
+}*@
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <h2>Регистрация</h2>
+            <p>Заполните все поля, чтобы создать новый аккаунт.</p>
+            <form action="" method="post">
+                <div class="form-group">
+                    <label>Имя</label>
+                    <input type="text" name="name" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Электронная почта</label>
+                    <input type="email" name="email" class="form-control" required />
+                </div>
+                <div class="form-group">
+                    <label>Пароль</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>Повторите пароль</label>
+                    <input type="password" name="confirm_password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" name="submit" class="btn btn-primary" value="Зарегистрироваться">
+                </div>
+                <p>Уже зарегистрированы? <a href="Login">Войдите в систему</a>.</p>
+            </form>
+        </div>
+    </div>
+</div>
+
