@@ -12,16 +12,23 @@ namespace WebTest2.Controllers
 {
     public class UserController : Controller
     {
-        [HttpPost]
+        [HttpGet]
         public IActionResult Login()
         {
             return View("Login");
         }
 
-        [HttpPost]
+        [HttpGet]
         public IActionResult Registration()
         {
             return View("Registration");
+        }
+
+        [HttpPost]
+        public IActionResult Registration(User user)
+        {
+
+            return View("Index");
         }
     }
 }

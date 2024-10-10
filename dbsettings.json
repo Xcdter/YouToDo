@@ -1,0 +1,5 @@
+﻿{
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=()\\SQLLite;Database=test_db;Trusted_Connection=True;MultipleActiveResultSets=true"
+  }
+}

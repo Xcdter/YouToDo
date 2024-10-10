@@ -58,6 +58,10 @@ namespace WebTest2
                     name: "Registration",
                     pattern: "{controller=User}/{action=Registration}/{id?}");
 
+                endpoints.MapControllerRoute(
+                    name: "Registration",
+                    pattern: "{controller=User}/{action=Login}/{id?}");
+
                 endpoints.MapRazorPages();
             });
         }
