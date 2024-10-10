@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace WebTest2.Models
 {
-    public class User
+    public partial class User
     {
         public int UserId { get; set; }
 

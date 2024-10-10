@@ -7,11 +7,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebTest2.Models;
+using YouToDo.Repositories;
 
 namespace WebTest2.Controllers
 {
     public class UserController : Controller
     {
+        private readonly AppDbContext _context;
+
+        public UserController(AppDbContext context)
+        {
+            _context = context;
+        }
+
         [HttpGet]
         public IActionResult Login()
         {
@@ -27,8 +35,13 @@ namespace WebTest2.Controllers
         [HttpPost]
         public IActionResult Registration(User user)
         {
+            user.CreatedDate = DateTime.Now.ToUniversalTime();
+    
+            _context.Users.Add(user);
 
-            return View("Index");
+            _context.SaveChanges();
+
+            return Redirect("/Home");
         }
     }
 }
