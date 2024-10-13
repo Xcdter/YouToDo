@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -9,7 +11,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using WebTest2.Models;
 using YouToDo.Repositories;
+using System.Security.Cryptography;
 using static WebTest2.Controllers.UserController;
+using System.Text;
 
 namespace WebTest2.Controllers
 {
@@ -17,17 +21,11 @@ namespace WebTest2.Controllers
     {
         private readonly AppDbContext _context;
 
-        private string _confirmPassword;
+        private string _password;
 
         public UserController(AppDbContext context)
         {
             _context = context;
-        }
-
-        [HttpGet]
-        public IActionResult Login()
-        {
-            return View("Login");
         }
 
         [HttpGet]
@@ -36,7 +34,7 @@ namespace WebTest2.Controllers
             return View("Registration");
         }
 
-        public class LoginModel
+        public class RegisterModel
         {
             [Required]
             [DataType(DataType.Password)]
@@ -49,7 +47,7 @@ namespace WebTest2.Controllers
         }
 
         [HttpPost]
-        public IActionResult Registration(User user, LoginModel model)
+        public IActionResult Registration(User user, RegisterModel model)
         {
             if (model.Password == model.Confirm_Password)
             {
@@ -75,6 +73,60 @@ namespace WebTest2.Controllers
             {
                 return View();
             }           
+        }
+
+        [HttpGet]
+        public IActionResult Login()
+        {
+            return View("Login");
+        }
+
+
+        public class LoginModel
+        {
+            [Required]
+            [DataType(DataType.EmailAddress)]
+            public string Email { get; set; }
+
+            [Required]
+            [DataType(DataType.Password)]
+            public string Password { get; set; }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            if (model.Email == null || model.Email == null)
+            {
+                return View();
+            }
+
+            var user = await FindByEmailAsync(model.Email);
+
+            if (user != null)
+            {
+                var hashedPassword = user.Password;
+
+                if (!BCrypt.Net.BCrypt.Verify(model.Password, hashedPassword))
+                {
+                    ModelState.AddModelError("WrongEmailOrPass", "Неверно указан пароль.");
+                    return View();
+                }
+                else
+                {
+                    return Redirect("/Home");
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("WrongEmailOrPass", "Неверно указана почта");
+                return View();
+            }
+        }
+
+        public async Task<User> FindByEmailAsync(string email)
+        {
+            return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
     }
 }
