@@ -1,7 +1,13 @@
-﻿
+﻿@using Microsoft.AspNetCore
+@using Microsoft.EntityFrameworkCore
+@using static WebTest2.Controllers.UserController
+
+
 @{
     ViewData["Title"] = "Login";
 }
+@model LoginModel
+
 
 <div class="container">
     <div class="row">
@@ -16,6 +22,7 @@
                 <div class="form-group">
                     <label>Пароль</label>
                     <input type="password" name="password" class="form-control" required>
+                    @Html.ValidationMessage("WrongEmailOrPass")
                 </div>
                 <div class="form-group">
                     <input type="submit" name="submit" class="btn btn-primary" value="Войти">
