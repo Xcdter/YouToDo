@@ -1,15 +1,20 @@
-- name: Send Telegram Message Ok
-    uses: appleboy/telegram-action@master
-    env:
-      GITHUB_CONTEXT: ${{ toJSON(github) }}
-    with:
-      to: ${{ secrets.TELEGRAM_ID }}
-      token: ${{ secrets.TELEGRAM_TOKEN }}
-      format: markdown
-      message: |
-        *1st line of your message with bold*
-        *2nd line of your message with bold, too*
-        Application: *Write something to be put inside your message*. The below lines still are part of your message.          
-        Branch: *${{ github.ref }}*
-        Repository: *${{ github.repository }}*
-        Owner: *${{ github.repository_owner }}*
+name: telegram message
+on: [push]
+jobs:
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: send telegram message on push
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            ${{ github.actor }} created commit:
+            Commit message: ${{ github.event.commits[0].message }}
+            
+            Repository: ${{ github.repository }}
+            
+            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
