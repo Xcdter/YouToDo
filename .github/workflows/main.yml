@@ -11,11 +11,9 @@ jobs:
     steps:
     - name: Send Telegram Message
       run: |
-        message="${{ github.actor }} created a commit:
-
-        Commit message: ${{ github.event.head_commit.message }}      
+        message="${{ github.actor }} created a commit: ${{ github.event.head_commit.message }}
         
-        https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+        See changes: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
         
         curl -s -X POST 'https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage' \
         -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&message_thread_id=${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}&text=$message"
