@@ -11,4 +11,4 @@ jobs:
       run: |
         message="${{ github.actor }} created a commit:\nCommit message: ${{ github.event.head_commit.message }}\n\nRepository: ${{ github.repository }}\n\nSee changes: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
         
-        curl -s -X POST 'https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_ID }}/sendMessage?chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&message_thread_id=${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}&text=$message"
+        curl -s -X POST 'https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage?chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&message_thread_id=${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}&text=$message"
