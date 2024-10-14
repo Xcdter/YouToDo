@@ -20,7 +20,7 @@ namespace YouToDo.Repositories
         {
             modelBuilder.HasDefaultSchema("public");
 
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<User>(entity => 
             {
                 entity.ToTable("Users");
 
