@@ -9,7 +9,7 @@ jobs:
     steps:
     - name: Send Telegram Message
       run: |
-        message="${{ github.actor }} created a commit:
+        message="${{ github.actor }} created a commit to the branch/tag '${{ github.ref_name}}':
         
         ${{ github.event.head_commit.message }}
         
