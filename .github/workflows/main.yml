@@ -1,20 +1,15 @@
-name: telegram message
-on: [push]
-jobs:
+name: Send Telegram Message on Commit
 
-  build:
-    name: Build
+on:
+  push:  # Triggers the action on every commit push
+
+jobs:
+  send_message:
     runs-on: ubuntu-latest
     steps:
-      - name: send telegram message on push
-        uses: appleboy/telegram-action@master
-        with:
-          to: ${{ secrets.TELEGRAM_TO }}
-          token: ${{ secrets.TELEGRAM_TOKEN }}
-          message: |
-            ${{ github.actor }} created commit:
-            Commit message: ${{ github.event.commits[0].message }}
-            
-            Repository: ${{ github.repository }}
-            
-            See changes: https://github.com/${{ github.repository }}/commit/${{github.sha}}
+    - name: Send Telegram Message
+      run: |
+        message="${{ github.actor }} created a commit:\nCommit message: ${{ github.event.head_commit.message }}\n\nRepository: ${{ github.repository }}\n\nSee changes: https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+        
+        curl -s -X POST 'https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_ID }}/sendMessage' \
+        -d "chat_id=${{ secrets.TELEGRAM_CHAT_ID }}&message_thread_id=${{ secrets.TELEGRAM_MESSAGE_THREAD_ID }}&text=$message"
