@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using WebTest2.Models;
+using YouToDo.Filters;
 
 namespace WebTest2.Controllers
 {
@@ -22,6 +23,7 @@ namespace WebTest2.Controllers
             _logger = logger;
         }
 
+        [SessionAuthorize]
         public IActionResult Index()
         {
             return View();
