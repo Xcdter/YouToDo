@@ -7,9 +7,9 @@ using YouToDo.Filters;
 
 namespace YouToDo.Controllers
 {
+    [SessionAuthorize]
     public class SecretController : Controller
     {
-        [SessionAuthorize]
         public IActionResult Wow()
         {
             return View();

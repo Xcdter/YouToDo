@@ -5,6 +5,7 @@ using System;
 using WebTest2.Models;
 using Microsoft.AspNetCore.Identity;
 using System.Web.Helpers;
+using YouToDo.Models;
 
 namespace YouToDo.Repositories
 {
@@ -37,5 +38,6 @@ namespace YouToDo.Repositories
 
             base.OnModelCreating(modelBuilder);
         }
+        public DbSet<YouToDo.Models.TaskModel> TaskModel { get; set; }
     }
 }
