@@ -28,6 +28,8 @@ namespace YouToDo.Models
 
         public string Tags { get; set; }
 
+        public int? ProjectId { get; set; }
+
         [ForeignKey("User")]
         public int UserId { get; set; }
     }
