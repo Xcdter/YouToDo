@@ -23,10 +23,20 @@ namespace YouToDo.Controllers
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult Edit()
+        public IActionResult Create()
         {
-            return View();
+            return View("Edit");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var task = await _context.Tasks.FindAsync(id);
+            if (task == null)
+            {
+                return NotFound();
+            }
+            return View(task);
         }
 
         [HttpPost]
@@ -54,6 +64,11 @@ namespace YouToDo.Controllers
 
             var tasks = await _context.Tasks
                 .Where(t => t.UserId == userId).ToListAsync();
+
+            foreach (var task in tasks)
+            {
+                Console.WriteLine($"Title: {task.Title}, CreatedDate: {task.CreatedDate}, UpdatedDate: {task.UpdatedDate}");
+            }
 
             return View(tasks);
         }

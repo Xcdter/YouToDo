@@ -1,14 +1,59 @@
-﻿@using Microsoft.AspNetCore
-@using Microsoft.EntityFrameworkCore
-@using YouToDo.Models
-@using static YouToDo.Controllers.TaskController
-
-@model List<YouToDo.Models.TaskModel>
+﻿@model IEnumerable<YouToDo.Models.TaskModel>
 
 @{
-    ViewData["Title"] = "List";
+    ViewData["Title"] = "All Tasks";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Список задач</h1>
+<div class="container" style="display: flex;">
+    <!-- Sidebar Section -->
+    <aside style="width: 20%; padding: 20px; border-right: 1px solid #ddd;">
+        <a asp-action="Create" class="create-btn btn btn-outline-dark" style="margin-bottom: 20px; display: block;">Create</a>
+        <ul class="project-list" style="list-style-type: none; padding: 0;">
+            <li><a href="#" class="active" style="text-decoration: none; color: #6c757d; display: block; padding: 10px 0; font-weight: bold; color: purple;">All Tasks</a></li>
+            <li><a href="#" style="text-decoration: none; color: #6c757d; display: block; padding: 10px 0;">Project 1</a></li>
+            <li><a href="#" style="text-decoration: none; color: #6c757d; display: block; padding: 10px 0;">Project 2</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Section -->
+    <main style="width: 80%; padding: 20px;">
+        <h1 style="font-size: 2em; color: #666;">All Tasks</h1>
+
+        <table class="table task-table" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Title</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Priority</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Project</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Tags</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Due Date</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Updated Date</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Created Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td><a asp-action="Edit" asp-route-id="@task.Id" style="color: #007bff; text-decoration: none;">@task.Title</a></td>
+                        <td>@task.Priority</td>
+                        <!--<td>task.Project</td>-->
+                        <td>@task.Tags</td>
+                        <td>@task.DueDate?.ToString()</td>
+                        <td>@task.CreatedDate.ToString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <nav class="pagination" style="display: flex; justify-content: center; margin-top: 20px;">
+            <ul style="list-style-type: none; padding: 0; display: flex; gap: 10px;">
+                <li><a href="#" style="color: #6c757d; text-decoration: none;">1</a></li>
+                <li><a href="#" style="color: #6c757d; text-decoration: none;">2</a></li>
+                <li><a href="#" style="color: #6c757d; text-decoration: none;">3</a></li>
+                <li><a href="#" style="color: #6c757d; text-decoration: none;">4</a></li>
+            </ul>
+        </nav>
+    </main>
 </div>

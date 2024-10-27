@@ -50,7 +50,7 @@ namespace YouToDo.Repositories
 
                 entity.Property(e => e.CreatedDate).HasColumnName("created_date");
 
-                entity.Property(e => e.UpdatetDate).HasColumnName("updated_date");
+                entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
 
                 entity.Property(e => e.DueDate).HasColumnName("due_date");
 
