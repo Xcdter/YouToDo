@@ -35,11 +35,10 @@
                 @foreach (var task in Model)
                 {
                     <tr>
-                        <td><a asp-action="Edit" asp-route-id="@task.Id" style="color: #007bff; text-decoration: none;">@task.Title</a></td>
+                        <td><a asp-action="ViewTask" asp-route-id="@task.Id" style="color: #007bff; text-decoration: none;">@task.Title</a></td>
                         <td>@task.Priority</td>
                         <td></td>
                         <td>@task.Tags</td>
-                        <td>@task.DueDate?.ToString()</td>
                         <td>@task.DueDate?.ToString()</td>
                         <td>@task.UpdatedDate?.ToString()</td>
                         <td>@task.CreatedDate.ToString()</td>

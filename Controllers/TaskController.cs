@@ -24,6 +24,14 @@ namespace YouToDo.Controllers
         }
 
         [HttpGet]
+        public IActionResult ViewTask(int? id)
+        {
+            TaskModel task = _context.Tasks.AsNoTracking().FirstOrDefault(t => t.Id == id.Value);
+
+            return View(task);
+        }
+
+        [HttpGet]
         public IActionResult Create()
         {
             // Вы можете вернуть пустую модель для создания новой задачи
@@ -111,7 +119,7 @@ namespace YouToDo.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> List(int page = 1, int pageSize = 5)
         {
             var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 
