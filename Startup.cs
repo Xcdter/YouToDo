@@ -26,8 +26,16 @@ namespace WebTest2
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AppDbContext>(options => options.UseNpgsql(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddControllersWithViews();
+            
             services.AddRazorPages();
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromMinutes(30); // Set session timeout
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true; // Make the session cookie essential
+            });
+
+            services.AddControllersWithViews();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -48,20 +56,19 @@ namespace WebTest2
 
             app.UseRouting();
 
+            app.UseSession();
+
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
+                //endpoints.MapControllerRoute(
+                //    name: "default",
+                //    pattern: "{controller=Home}/{action=Index}/{id?}");
+
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-
-                endpoints.MapControllerRoute(
-                    name: "Registration",
-                    pattern: "{controller=User}/{action=Registration}/{id?}");
-
-                endpoints.MapControllerRoute(
-                    name: "Registration",
                     pattern: "{controller=User}/{action=Login}/{id?}");
 
                 endpoints.MapRazorPages();

@@ -61,7 +61,10 @@ namespace WebTest2.Controllers
 
                     _context.SaveChanges();
 
-                    return Redirect("/Home");
+                    HttpContext.Session.SetString("UserId", user.UserId.ToString());
+                    HttpContext.Session.SetString("Username", user.Name);
+
+                    return Redirect("/Secret/Wow");
                 }
                 else
                 {
@@ -98,7 +101,7 @@ namespace WebTest2.Controllers
         {
             if (model.Email == null || model.Email == null)
             {
-                return View();
+                return View(model);
             }
 
             var user = await FindByEmailAsync(model.Email);
@@ -114,19 +117,30 @@ namespace WebTest2.Controllers
                 }
                 else
                 {
-                    return Redirect("/Home");
+                    HttpContext.Session.SetString("UserId", user.UserId.ToString());
+                    HttpContext.Session.SetString("Username", user.Name);
+
+                    return Redirect("/Task/List");
                 }
             }
             else
             {
                 ModelState.AddModelError("WrongEmailOrPass", "Неверно указана почта");
-                return View();
+                return View(model);
             }
         }
 
         public async Task<User> FindByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public IActionResult Logout()
+        {
+            HttpContext.Session.Clear(); // Clear session data
+            return RedirectToAction("Login"); // Redirect to login page
         }
     }
 }

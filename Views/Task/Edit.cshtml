@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore
+@using Microsoft.EntityFrameworkCore
+@using YouToDo.Models
+@using static YouToDo.Controllers.TaskController
+
+@model TaskModel
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h2>@(Model.Id == 0 ? "Новая задача" : "Редактирование задачи")</h2>
+
+<form asp-action="SaveTask" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div style="display: flex;">
+        <div style="flex: 1; padding-right: 20px;">
+            <div>
+                <label asp-for="Title">Заголовок</label>
+                <input asp-for="Title" style="width: 100%;" class="form-control" required />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label asp-for="Description">Описание</label>
+                <textarea asp-for="Description" style="width: 100%; height: 150px;" class="form-control"></textarea>
+            </div>
+        </div>
+
+        <div style="flex: 1;">
+            <div>
+                <label asp-for="Priority">Приоритет</label>
+                <select asp-for="Priority" style="width: 100%;" class="form-control">
+                    <option value="0">Нет</option>
+                    <option value="1">Низкий</option>
+                    <option value="2">Средний</option>
+                    <option value="3">Высокий</option>
+                </select>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label asp-for="ProjectId">Проект</label>
+                <input asp-for="ProjectId" style="width: 100%;" class="form-control" />
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label asp-for="Tags">Теги</label>
+                <input asp-for="Tags" style="width: 100%;" class="form-control" />
+            </div>
+
+            <div style="margin-top: 20px;">
+                <label asp-for="DueDate">Дата завершения</label>
+                <input asp-for="DueDate" type="date" style="width: 100%;" class="form-control" />
+            </div>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px; text-align: left;">
+        <button type="submit" style="padding: 10px 20px;">Сохранить</button>
+        <a asp-action="List" class="btn btn-secondary">Отмена</a>
+    </div>
+</form>
+

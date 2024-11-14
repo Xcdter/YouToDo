@@ -1,0 +1,71 @@
+﻿@model IEnumerable<YouToDo.Models.TaskModel>
+
+@{
+    ViewData["Title"] = "All Tasks";
+}
+
+<div class="container" style="display: flex;">
+    <!-- Sidebar Section -->
+    <aside style="width: 20%; padding: 20px; border-right: 1px solid #ddd;">
+        <a asp-action="Create" class="create-btn btn btn-outline-dark" style="margin-bottom: 20px; display: block;">Создать</a>
+        <ul class="project-list" style="list-style-type: none; padding: 0;">
+            <li><a href="#" class="active" style="text-decoration: none; color: #6c757d; display: block; padding: 10px 0; font-weight: bold; color: purple;">Все задачи</a></li>
+            <li><a href="#" style="text-decoration: none; color: #6c757d; display: block; padding: 10px 0;">Проект 1</a></li>
+            <li><a href="#" style="text-decoration: none; color: #6c757d; display: block; padding: 10px 0;">Проект 2</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Content Section -->
+    <main style="width: 80%; padding: 20px;">
+        <h1 style="font-size: 2em; color: #666;">Все задачи</h1>
+
+        <table class="table task-table" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Заголовок</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Приоритет</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Проект</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Теги</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Дата завершения</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Дата обновления</th>
+                    <th style="background-color: #add8e6; color: #fff; text-align: left;">Дата создания</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    <tr>
+                        <td><a asp-action="ViewTask" asp-route-id="@task.Id" style="color: #007bff; text-decoration: none;">@task.Title</a></td>
+                        <td>@task.Priority</td>
+                        <td></td>
+                        <td>@task.Tags</td>
+                        <td>@task.DueDate?.ToString()</td>
+                        <td>@task.UpdatedDate?.ToString()</td>
+                        <td>@task.CreatedDate.ToString()</td>
+                        <td>
+                            <form asp-action="DeleteTask" method="post" style="display:inline;">
+                                <input type="hidden" name="id" value="@task.Id" />
+                                <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Are you sure you want to delete this task?');">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <nav class="pagination" style="display: flex; justify-content: center; margin-top: 20px;">
+            <ul style="list-style-type: none; padding: 0; display: flex; gap: 10px;">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                    <li>
+                        <a href="@Url.Action("List", new { page = i })"
+                           style="color: @(ViewBag.CurrentPage == i ? "#007bff" : "#6c757d"); text-decoration: none;">
+                            @i
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </main>
+</div>
