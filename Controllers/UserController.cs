@@ -64,7 +64,7 @@ namespace WebTest2.Controllers
                     HttpContext.Session.SetString("UserId", user.UserId.ToString());
                     HttpContext.Session.SetString("Username", user.Name);
 
-                    return Redirect("/Secret/Wow");
+                    return Redirect("Task/List");
                 }
                 else
                 {

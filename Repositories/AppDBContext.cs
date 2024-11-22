@@ -19,6 +19,8 @@ namespace YouToDo.Repositories
 
         public DbSet<TaskModel> Tasks { get; set; }
 
+        public DbSet<Project> Projects { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("public");
@@ -59,6 +61,25 @@ namespace YouToDo.Repositories
                 entity.Property(e => e.Tags).HasColumnName("tags");
 
                 entity.Property(e => e.ProjectId).HasColumnName("project_id");
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+            });
+
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.ToTable("Projects");
+
+                entity.Property(e => e.Id).HasColumnName("project_id");
+
+                entity.Property(e => e.Title).HasColumnName("title");
+
+                entity.Property(e => e.Description).HasColumnName("description");
+
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+
+                entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
+
+                entity.Property(e => e.DueDate).HasColumnName("due_date");
 
                 entity.Property(e => e.UserId).HasColumnName("user_id");
             });

@@ -40,7 +40,13 @@
 
             <div style="margin-top: 20px;">
                 <label asp-for="ProjectId">Проект</label>
-                <input asp-for="ProjectId" style="width: 100%;" class="form-control" />
+                <select asp-for="ProjectId" class="form-control" style="width: 100%;">
+                    <option value="">-- Выберите проект --</option>
+                    @foreach (var project in ViewBag.Projects)
+                    {
+                        <option value="@project.Id">@project.Title</option>
+                    }
+                </select>
             </div>
 
             <div style="margin-top: 20px;">

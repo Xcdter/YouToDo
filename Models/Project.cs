@@ -1,11 +1,11 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+using System;
 using YouToDo.Filters;
 
 namespace YouToDo.Models
 {
-    public class TaskModel
+    public class Project
     {
         [Key]
         public int Id { get; set; }
@@ -14,7 +14,7 @@ namespace YouToDo.Models
         [StringLength(200, ErrorMessage = "Заголовок не должен превышать 200 символов.")]
         public string Title { get; set; }
 
-        [StringLength(10000, ErrorMessage = "Описание не должно превышать 10000 символов.")]
+        [StringLength(1000, ErrorMessage = "Описание не должно превышать 1000 символов.")]
         public string Description { get; set; }
 
         public DateTime CreatedDate { get; set; }
@@ -22,15 +22,6 @@ namespace YouToDo.Models
         public DateTime? UpdatedDate { get; set; }
 
         public DateTime? DueDate { get; set; }
-
-        [Column(TypeName = "smallint")]
-        public PriorityLevel Priority { get; set; }
-
-        public string Tags { get; set; }
-
-        public int? ProjectId { get; set; }
-
-        public Project Project { get; set; }
 
         [ForeignKey("User")]
         public int UserId { get; set; }

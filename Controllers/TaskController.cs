@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -34,10 +35,16 @@ namespace YouToDo.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            // Вы можете вернуть пустую модель для создания новой задачи
-            var model = new TaskModel();
+            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 
-            return View("Edit", model); // Передаем пустую модель в представление
+            var projects = _context.Projects
+                .Where(p => p.UserId == userId)
+                .Select(p => new { p.Id, p.Title })
+                .ToList();
+
+            ViewBag.Projects = projects;
+
+            return View("Edit", new TaskModel()); // Передаем пустую модель в представление
         }
 
         // GET: Task/Edit/5
@@ -62,6 +69,15 @@ namespace YouToDo.Controllers
                 // Если `id` не передан, создаем новую пустую задачу
                 task = new TaskModel();
             }
+
+            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
+
+            var projects = _context.Projects
+                .Where(p => p.UserId == userId)
+                .Select(p => new { p.Id, p.Title })
+                .ToList();
+
+            ViewBag.Projects = projects;
 
             return View(task);
         }
@@ -135,11 +151,19 @@ namespace YouToDo.Controllers
                 .Take(pageSize) // Берем только нужное количество задач
                 .ToListAsync();
 
+            // Получение проектов пользователя
+            var projects = await _context.Projects
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+
             // Сохраняем информацию о пагинации в ViewBag
             ViewBag.TotalPages = (int)Math.Ceiling((double)totalTasks / pageSize);
             ViewBag.CurrentPage = page;
 
-            return View(tasks);
+            // Формируем модель
+            var model = (Tasks: (IEnumerable<TaskModel>)tasks, Projects: (IEnumerable<Project>)projects);
+
+            return View(model);
         }
 
         [HttpPost]
