@@ -134,38 +134,6 @@ namespace YouToDo.Controllers
             return View("Edit", model); // Если модель не валидна, вернуть её в представление
         }
 
-        [HttpGet]
-        public async Task<IActionResult> List(int page = 1, int pageSize = 5)
-        {
-            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
-
-            // Получение общего количества задач
-            var totalTasks = await _context.Tasks
-                .CountAsync(t => t.UserId == userId);
-
-            // Получение задач для текущей страницы
-            var tasks = await _context.Tasks
-                .Where(t => t.UserId == userId)
-                .OrderByDescending(t => t.UpdatedDate)
-                .Skip((page - 1) * pageSize) // Пропускаем задачи предыдущих страниц
-                .Take(pageSize) // Берем только нужное количество задач
-                .ToListAsync();
-
-            // Получение проектов пользователя
-            var projects = await _context.Projects
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
-
-            // Сохраняем информацию о пагинации в ViewBag
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalTasks / pageSize);
-            ViewBag.CurrentPage = page;
-
-            // Формируем модель
-            var model = (Tasks: (IEnumerable<TaskModel>)tasks, Projects: (IEnumerable<Project>)projects);
-
-            return View(model);
-        }
-
         [HttpPost]
         public async Task<IActionResult> DeleteTask(int id)
         {

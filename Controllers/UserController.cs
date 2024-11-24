@@ -64,7 +64,7 @@ namespace WebTest2.Controllers
                     HttpContext.Session.SetString("UserId", user.UserId.ToString());
                     HttpContext.Session.SetString("Username", user.Name);
 
-                    return Redirect("Task/List");
+                    return RedirectToAction("List", "ListPage");
                 }
                 else
                 {
@@ -120,7 +120,7 @@ namespace WebTest2.Controllers
                     HttpContext.Session.SetString("UserId", user.UserId.ToString());
                     HttpContext.Session.SetString("Username", user.Name);
 
-                    return Redirect("/Task/List");
+                    return RedirectToAction("List", "ListPage");
                 }
             }
             else

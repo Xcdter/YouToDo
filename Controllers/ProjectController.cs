@@ -97,32 +97,32 @@ namespace YouToDo.Controllers
             return View("Edit", model);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> ViewProject(int id)
-        {
-            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
+        //[HttpGet]
+        //public async Task<IActionResult> ViewProject(int id)
+        //{
+        //    var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 
-            var projects = await _context.Projects
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
+        //    var projects = await _context.Projects
+        //        .Where(p => p.UserId == userId)
+        //        .ToListAsync();
 
-            var project = projects.FirstOrDefault(p => p.Id == id);
+        //    var project = projects.FirstOrDefault(p => p.Id == id);
 
-            if (project == null)
-            {
-                return NotFound();
-            }
+        //    if (project == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var tasks = await _context.Tasks
-                .Where(t => t.ProjectId == id && t.UserId == userId)
-                .OrderByDescending(t => t.UpdatedDate)
-                .ToListAsync();
+        //    var tasks = await _context.Tasks
+        //        .Where(t => t.ProjectId == id && t.UserId == userId)
+        //        .OrderByDescending(t => t.UpdatedDate)
+        //        .ToListAsync();
 
-            var model = (Tasks: (IEnumerable<TaskModel>)tasks, Projects: (IEnumerable<Project>)projects);
+        //    var model = (Tasks: (IEnumerable<TaskModel>)tasks, Projects: (IEnumerable<Project>)projects);
 
-            return Redirect("Task/List");
+        //    return Redirect("Task/List");
 
-            //return View("Task/List", model);
-        }
+        //    //return View("Task/List", model);
+        //}
     }
 }
