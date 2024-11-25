@@ -1,7 +1,7 @@
 ﻿@model YouToDo.Models.TaskProjectModel
 
 @{
-    ViewData["Title"] = "Tasks";
+    ViewData["Title"] = "Your Tasks";
 }
 
 <div class="container" style="display: flex;">
@@ -47,7 +47,13 @@
 
     <!-- Main Content Section -->
     <main style="width: 80%; padding: 20px;">
-        <h1 style="font-size: 2em; color: #666;">Все задачи</h1>
+        <h1 style="font-size: 2em; color: #666;">
+            Все задачи
+            @if (!string.IsNullOrEmpty(Model.FilteredPriority))
+            {
+                <span>- @Model.FilteredPriority</span>
+            }
+        </h1>
 
         <table class="table task-table" style="width: 100%;">
             <thead>
@@ -67,7 +73,14 @@
                 {
                     <tr>
                         <td><a asp-action="ViewTask" asp-controller="Task" asp-route-id="@task.Id" style="color: #007bff; text-decoration: none;">@task.Title</a></td>
-                        <td>@task.Priority</td>
+                        <td>
+                            <a asp-action="FilterByPriority"
+                               asp-controller="ListPage"
+                               asp-route-priority="@((short)task.Priority)"
+                               style="color: #007bff; text-decoration: none;">
+                                @task.Priority.ToString()
+                            </a>
+                        </td>
                         <td>@(task.Project != null ? task.Project.Title : "Без проекта")</td>
                         <td>@task.Tags</td>
                         <td>@task.DueDate?.ToString("yyyy-MM-dd")</td>
