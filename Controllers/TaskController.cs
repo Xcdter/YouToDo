@@ -128,7 +128,7 @@ namespace YouToDo.Controllers
                 }
 
                 await _context.SaveChangesAsync();
-                return RedirectToAction("List");
+                return RedirectToAction("List", "ListPage");
             }
 
             return View("Edit", model); // Если модель не валидна, вернуть её в представление
@@ -146,7 +146,7 @@ namespace YouToDo.Controllers
             _context.Tasks.Remove(task); // Удаляем задачу
             await _context.SaveChangesAsync(); // Сохраняем изменения в базе данных
 
-            return RedirectToAction("List"); // Перенаправляем на список задач
+            return RedirectToAction("List", "ListPage"); // Перенаправляем на список задач
         }
 
     }
