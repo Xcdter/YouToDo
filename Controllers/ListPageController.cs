@@ -37,12 +37,13 @@ namespace YouToDo.Controllers
                 .Take(pageSize)
                 .ToListAsync();
 
-            ViewBag.ActiveProjectId = null; // Нет активного проекта (отображаются все задачи)
+            ViewBag.ActiveProjectId = null;
 
             var model = new TaskProjectModel
             {
                 Tasks = tasks,
-                Projects = projects
+                Projects = projects,
+                FilteredPriority = null
             };
 
             return View("List", model);
@@ -62,12 +63,46 @@ namespace YouToDo.Controllers
                 .OrderByDescending(t => t.UpdatedDate)
                 .ToListAsync();
 
-            ViewBag.ActiveProjectId = id; // Устанавливаем активный проект
+            ViewBag.ActiveProjectId = id;
 
             var model = new TaskProjectModel
             {
                 Tasks = tasks,
                 Projects = projects
+            };
+
+            return View("List", model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterByPriority(short priority)
+        {
+            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
+
+            // Преобразуем числовое значение в перечисление PriorityLevel
+            if (!Enum.IsDefined(typeof(PriorityLevel), priority))
+            {
+                return BadRequest("Invalid priority level");
+            }
+
+            var priorityLevel = (PriorityLevel)priority;
+
+            // Фильтрация задач по приоритету
+            var tasks = await _context.Tasks
+                .Where(t => t.UserId == userId && t.Priority == priorityLevel)
+                .OrderByDescending(t => t.UpdatedDate)
+                .ToListAsync();
+
+            // Получение всех проектов для бокового меню
+            var projects = await _context.Projects
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+
+            var model = new TaskProjectModel
+            {
+                Tasks = tasks,
+                Projects = projects,
+                FilteredPriority = priorityLevel.ToString()
             };
 
             return View("List", model);
