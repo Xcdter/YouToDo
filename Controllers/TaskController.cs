@@ -33,7 +33,7 @@ namespace YouToDo.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult CreateTask()
         {
             var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 

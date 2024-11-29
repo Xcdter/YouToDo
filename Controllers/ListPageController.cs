@@ -7,6 +7,7 @@ using YouToDo.Repositories;
 using System.Linq;
 using YouToDo.Models;
 using YouToDo.Filters;
+using System.Collections.Generic;
 
 namespace YouToDo.Controllers
 {
@@ -20,9 +21,8 @@ namespace YouToDo.Controllers
             _context = context;
         }
 
-
         [HttpGet]
-        public async Task<IActionResult> List(int page = 1, int pageSize = 5)
+        public async Task<IActionResult> List(int page = 1, int pageSize = 5, int? projectId = null, short? priority = null, string tag = null)
         {
             var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 
@@ -30,83 +30,82 @@ namespace YouToDo.Controllers
                 .Where(p => p.UserId == userId)
                 .ToListAsync();
 
-            var tasks = await _context.Tasks
-                .Where(t => t.UserId == userId)
-                .OrderByDescending(t => t.UpdatedDate)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            var tasksQuery = _context.Tasks
+                .Where(t => t.UserId == userId);
 
-            ViewBag.ActiveProjectId = null;
+            if (projectId.HasValue)
+            {
+                tasksQuery = tasksQuery.Where(t => t.ProjectId == projectId.Value);
+            }
+
+            if (priority.HasValue)
+            {
+                tasksQuery = tasksQuery.Where(t => t.Priority == (PriorityLevel)priority.Value);
+            }
+
+            if (!string.IsNullOrEmpty(tag))
+            {
+                tasksQuery = tasksQuery.Where(t => t.Tags.Contains(tag));
+            }
+
+            tasksQuery = tasksQuery.OrderByDescending(t => t.UpdatedDate);
+
+            var (paginatedTasks, totalPages) = await PaginateAsync(tasksQuery, page, pageSize);
 
             var model = new TaskProjectModel
             {
-                Tasks = tasks,
+                Tasks = paginatedTasks,
                 Projects = projects,
-                FilteredPriority = null
+                CurrentPage = page,
+                TotalPages = totalPages,
+                PageSize = pageSize,
+                FilteredPriority = priority.HasValue ? Enum.GetName(typeof(PriorityLevel), priority.Value) : null,
+                FilteredPriorityValue = priority,
+                ActiveTag = tag,
+                ActiveProjectId = projectId
             };
 
             return View("List", model);
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> ViewProject(int id)
+        public IActionResult ViewProject(int id, int page = 1, int pageSize = 1)
         {
-            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
-
-            var projects = await _context.Projects
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
-
-            var tasks = await _context.Tasks
-                .Where(t => t.ProjectId == id && t.UserId == userId)
-                .OrderByDescending(t => t.UpdatedDate)
-                .ToListAsync();
-
-            ViewBag.ActiveProjectId = id;
-
-            var model = new TaskProjectModel
-            {
-                Tasks = tasks,
-                Projects = projects
-            };
-
-            return View("List", model);
+            return RedirectToAction("List", new { projectId = id, page, pageSize });
         }
 
-        [HttpGet]
-        public async Task<IActionResult> FilterByPriority(short priority)
-        {
-            var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 
-            // Преобразуем числовое значение в перечисление PriorityLevel
+        [HttpGet]
+        public IActionResult FilterByPriority(short priority, int pageSize = 1)
+        {
             if (!Enum.IsDefined(typeof(PriorityLevel), priority))
             {
                 return BadRequest("Invalid priority level");
             }
 
-            var priorityLevel = (PriorityLevel)priority;
-
-            // Фильтрация задач по приоритету
-            var tasks = await _context.Tasks
-                .Where(t => t.UserId == userId && t.Priority == priorityLevel)
-                .OrderByDescending(t => t.UpdatedDate)
-                .ToListAsync();
-
-            // Получение всех проектов для бокового меню
-            var projects = await _context.Projects
-                .Where(p => p.UserId == userId)
-                .ToListAsync();
-
-            var model = new TaskProjectModel
-            {
-                Tasks = tasks,
-                Projects = projects,
-                FilteredPriority = priorityLevel.ToString()
-            };
-
-            return View("List", model);
+            return RedirectToAction("List", new { priority, pageSize });
         }
+
+        [HttpGet]
+        public IActionResult FilterByTag(string tag, int pageSize = 1)
+        {
+            return RedirectToAction("List", new { tag, pageSize });
+        }
+
+        private async Task<(IEnumerable<T> Items, int TotalPages)> PaginateAsync<T>(IQueryable<T> query, int page, int pageSize)
+        {
+            var totalItems = await query.CountAsync();
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+
+            var paginatedItems = await query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (paginatedItems, totalPages);
+        }
+
     }
 }
 

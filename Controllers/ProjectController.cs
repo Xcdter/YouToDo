@@ -91,38 +91,10 @@ namespace YouToDo.Controllers
                 }
 
                 await _context.SaveChangesAsync();
-                return RedirectToAction("List", "Task");
+                return RedirectToAction("List", "ListPage");
             }
 
             return View("Edit", model);
         }
-
-        //[HttpGet]
-        //public async Task<IActionResult> ViewProject(int id)
-        //{
-        //    var userId = int.Parse(HttpContext.Session.GetString("UserId"));
-
-        //    var projects = await _context.Projects
-        //        .Where(p => p.UserId == userId)
-        //        .ToListAsync();
-
-        //    var project = projects.FirstOrDefault(p => p.Id == id);
-
-        //    if (project == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var tasks = await _context.Tasks
-        //        .Where(t => t.ProjectId == id && t.UserId == userId)
-        //        .OrderByDescending(t => t.UpdatedDate)
-        //        .ToListAsync();
-
-        //    var model = (Tasks: (IEnumerable<TaskModel>)tasks, Projects: (IEnumerable<Project>)projects);
-
-        //    return Redirect("Task/List");
-
-        //    //return View("Task/List", model);
-        //}
     }
 }
