@@ -26,6 +26,7 @@ namespace YouToDo.Models
         [Column(TypeName = "smallint")]
         public PriorityLevel Priority { get; set; }
 
+        [StringLength(20, ErrorMessage = "Заголовок не должен превышать 20 символов.")]
         public string Tags { get; set; }
 
         public int? ProjectId { get; set; }
