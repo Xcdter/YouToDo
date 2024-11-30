@@ -26,32 +26,40 @@ namespace YouToDo.Controllers
         {
             var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 
+            // Получение проектов пользователя
             var projects = await _context.Projects
                 .Where(p => p.UserId == userId)
                 .ToListAsync();
 
+            // Формирование базового запроса для задач
             var tasksQuery = _context.Tasks
                 .Where(t => t.UserId == userId);
 
+            // Фильтрация по проекту
             if (projectId.HasValue)
             {
                 tasksQuery = tasksQuery.Where(t => t.ProjectId == projectId.Value);
             }
 
+            // Фильтрация по приоритету
             if (priority.HasValue)
             {
                 tasksQuery = tasksQuery.Where(t => t.Priority == (PriorityLevel)priority.Value);
             }
 
+            // Фильтрация по тегу
             if (!string.IsNullOrEmpty(tag))
             {
                 tasksQuery = tasksQuery.Where(t => t.Tags.Contains(tag));
             }
 
+            // Сортировка по дате обновления
             tasksQuery = tasksQuery.OrderByDescending(t => t.UpdatedDate);
 
+            // Постраничное отображение
             var (paginatedTasks, totalPages) = await PaginateAsync(tasksQuery, page, pageSize);
 
+            // Создание модели для представления
             var model = new TaskProjectModel
             {
                 Tasks = paginatedTasks,
@@ -66,31 +74,6 @@ namespace YouToDo.Controllers
             };
 
             return View("List", model);
-        }
-
-
-        [HttpGet]
-        public IActionResult ViewProject(int id, int page = 1, int pageSize = 1)
-        {
-            return RedirectToAction("List", new { projectId = id, page, pageSize });
-        }
-
-
-        [HttpGet]
-        public IActionResult FilterByPriority(short priority, int pageSize = 1)
-        {
-            if (!Enum.IsDefined(typeof(PriorityLevel), priority))
-            {
-                return BadRequest("Invalid priority level");
-            }
-
-            return RedirectToAction("List", new { priority, pageSize });
-        }
-
-        [HttpGet]
-        public IActionResult FilterByTag(string tag, int pageSize = 1)
-        {
-            return RedirectToAction("List", new { tag, pageSize });
         }
 
         private async Task<(IEnumerable<T> Items, int TotalPages)> PaginateAsync<T>(IQueryable<T> query, int page, int pageSize)
