@@ -13,12 +13,21 @@
         <ul class="project-list" style="list-style-type: none; padding: 0;">
             <!-- Кнопка "Все задачи" -->
             <li>
-                <a href="@Model.GenerateUrl(Url, "List", "ListPage", new { projectId = (int?)null, priority = (short?)null, tag = (string)null, page = 1 })"
-                   class="@(Model.ActiveProjectId == null ? "active disabled" : "")"
-                   style="text-decoration: none; font-weight: bold; color: @(Model.ActiveProjectId == null ? "purple" : "#6c757d"); display: block; padding: 10px 0;"
-                @(Model.ActiveProjectId == null ? "tabindex='-1'" : "")>
-                    Все задачи
-                </a>
+                @if (Model.ActiveProjectId == null)
+                {
+                    <!-- Некликабельная активная ссылка -->
+                    <span style="text-decoration: none; color: gray; display: block; padding: 10px 0;">
+                        Все задачи
+                    </span>
+                }
+                else
+                {
+                    <!-- Кликабельная ссылка -->
+                    <a href="@Model.GenerateUrl(Url, "List", "ListPage", new { projectId = (int?)null, priority = (short?)null, tag = (string)null }, resetFilters: true)"
+                       style="text-decoration: none; color: blue; display: block; padding: 10px 0;">
+                        Все задачи
+                    </a>
+                }
             </li>
 
             <!-- Список проектов -->
@@ -28,16 +37,15 @@
                     @if (Model.ActiveProjectId == project.Id)
                     {
                         <!-- Некликабельная активная ссылка -->
-                        <span style="text-decoration: none; font-weight: bold; color: purple; display: block; padding: 10px 0;">
+                        <span style="text-decoration: none; color: gray; display: block; padding: 10px 0;">
                             @project.Title
                         </span>
                     }
                     else
                     {
                         <!-- Кликабельная ссылка -->
-                        <!-- Сброс всех фильтров при выборе проекта -->
-                        <a href="@Model.GenerateUrl(Url, "List", "ListPage", new { projectId = project.Id, page = 1, pageSize = 5 }, resetFilters: true)"
-                           style="text-decoration: none; color: #6c757d; display: block; padding: 10px 0;">
+                        <a href="@Model.GenerateUrl(Url, "List", "ListPage", new { projectId = project.Id, page = 1 }, resetFilters: true)"
+                           style="text-decoration: none; color: blue; display: block; padding: 10px 0;">
                             @project.Title
                         </a>
                     }
@@ -59,6 +67,18 @@
                 <span>- @Model.ActiveTag</span>
             }
         </h1>
+
+        <!-- Кнопка сброса фильтров -->
+        <div style="margin-bottom: 20px;">
+            <button onclick="window.location.href='@Model.GenerateUrl(Url, "List", "ListPage", new { page = 1 }, resetFilters: true)'"
+                    class="btn btn-outline-primary"
+            @if (Model.FilteredPriority == null && Model.ActiveTag == null)
+            {
+                @:disabled
+            }>
+                Сброс фильтров
+            </button>
+        </div>
 
         <table class="table task-table" style="width: 100%; margin-top: 20px;">
             <thead>
@@ -111,19 +131,28 @@
             </tbody>
         </table>
 
-        <!-- Pagination -->
-        <nav class="pagination" style="display: flex; justify-content: center; margin-top: 20px;">
-            <ul style="list-style-type: none; padding: 0; display: flex; gap: 10px;">
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <li>
-                        <a href="@Model.GenerateUrl(Url, "List", "ListPage", new { page = i })"
-                           style="color: @(Model.CurrentPage == i ? "#007bff" : "#6c757d"); text-decoration: none;">
-                            @i
-                        </a>
-                    </li>
-                }
-            </ul>
-        </nav>
+        @if (Model.TotalPages > 1)
+        {
+            <nav style="text-align: center; margin-top: 20px;">
+                <ul style="list-style-type: none; padding: 0; display: inline-block;">
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        if (i == Model.CurrentPage)
+                        {
+                            <li style="display: inline-block; margin-right: 5px;">
+                                <span style="color: gray; text-decoration: none; ">@i</span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li style="display: inline-block; margin-right: 5px;">
+                                <a href="@Model.GenerateUrl(Url, "List", "ListPage", new { page = i })"
+                                   style="color: blue; text-decoration: none;">@i</a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </nav>
+        }
     </main>
 </div>

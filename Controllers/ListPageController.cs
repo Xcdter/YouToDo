@@ -22,51 +22,48 @@ namespace YouToDo.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> List(int page = 1, int pageSize = 5, int? projectId = null, short? priority = null, string tag = null)
+        public async Task<IActionResult> List(int? projectId = null, short? priority = null, string tag = null, int? page = null, int? pageSize = null)
         {
             var userId = int.Parse(HttpContext.Session.GetString("UserId"));
 
-            // Получение проектов пользователя
+            int currentPage = page ?? 1; // Установка текущей страницы
+            int currentPageSize = pageSize ?? 5; // Установка размера страницы
+
+            currentPage = Math.Max(currentPage, 1); // Защита от некорректных значений
+
             var projects = await _context.Projects
                 .Where(p => p.UserId == userId)
                 .ToListAsync();
 
-            // Формирование базового запроса для задач
             var tasksQuery = _context.Tasks
                 .Where(t => t.UserId == userId);
 
-            // Фильтрация по проекту
             if (projectId.HasValue)
-            {
                 tasksQuery = tasksQuery.Where(t => t.ProjectId == projectId.Value);
-            }
 
-            // Фильтрация по приоритету
             if (priority.HasValue)
-            {
                 tasksQuery = tasksQuery.Where(t => t.Priority == (PriorityLevel)priority.Value);
-            }
 
-            // Фильтрация по тегу
             if (!string.IsNullOrEmpty(tag))
-            {
                 tasksQuery = tasksQuery.Where(t => t.Tags.Contains(tag));
-            }
 
-            // Сортировка по дате обновления
             tasksQuery = tasksQuery.OrderByDescending(t => t.UpdatedDate);
 
-            // Постраничное отображение
-            var (paginatedTasks, totalPages) = await PaginateAsync(tasksQuery, page, pageSize);
+            var (paginatedTasks, totalPages) = await PaginateAsync(tasksQuery, currentPage, currentPageSize);
 
-            // Создание модели для представления
+            if (currentPage > totalPages && totalPages > 0)
+            {
+                currentPage = 1; // Сбрасываем на первую страницу, если текущая выходит за пределы
+                (paginatedTasks, totalPages) = await PaginateAsync(tasksQuery, currentPage, currentPageSize);
+            }
+
             var model = new TaskProjectModel
             {
                 Tasks = paginatedTasks,
                 Projects = projects,
-                CurrentPage = page,
+                CurrentPage = currentPage,
                 TotalPages = totalPages,
-                PageSize = pageSize,
+                PageSize = currentPageSize,
                 FilteredPriority = priority.HasValue ? Enum.GetName(typeof(PriorityLevel), priority.Value) : null,
                 FilteredPriorityValue = priority,
                 ActiveTag = tag,
@@ -88,7 +85,6 @@ namespace YouToDo.Controllers
 
             return (paginatedItems, totalPages);
         }
-
     }
 }
 
