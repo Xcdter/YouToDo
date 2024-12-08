@@ -12,8 +12,9 @@ using System.Threading.Tasks;
 using WebTest2.Models;
 using YouToDo.Repositories;
 using System.Security.Cryptography;
-using static WebTest2.Controllers.UserController;
 using System.Text;
+using YouToDo.Helpers;
+using YouToDo.DTOs;
 
 namespace WebTest2.Controllers
 {
@@ -49,33 +50,34 @@ namespace WebTest2.Controllers
         [HttpPost]
         public IActionResult Registration(User user, RegisterModel model)
         {
-            if (model.Password == model.Confirm_Password)
+            if (!ModelState.IsValid)
             {
-                if (!_context.Users.Any(u => u.Email == user.Email))
-                {
-                    user.CreatedDate = DateTime.Now.ToUniversalTime();
-
-                    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-
-                    _context.Users.Add(user);
-
-                    _context.SaveChanges();
-
-                    HttpContext.Session.SetString("UserId", user.UserId.ToString());
-                    HttpContext.Session.SetString("Username", user.Name);
-
-                    return RedirectToAction("List", "ListPage");
-                }
-                else
-                {
-                    ModelState.AddModelError("EmailIsNotFree", "Пользователь с таким Email уже существует.");
-                    return View();
-                }
+                return View(model);
             }
-            else
+
+            if (model.Password != model.Confirm_Password)
             {
-                return View();
-            }           
+                ModelState.AddModelError("Confirm_Password", "Пароли не совпадают");
+                return View(model);
+            }
+
+            if (_context.Users.Any(u => u.Email == user.Email))
+            {
+                ModelState.AddModelError("EmailIsNotFree", "Пользователь с таким Email уже существует.");
+                return View(model);
+            }
+
+            user.Password = model.Password;
+
+            user.CreatedDate = DateTime.UtcNow;
+            user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+            _context.Users.Add(user);
+            _context.SaveChanges();
+
+            HttpContext.Session.SetString("UserId", user.UserId.ToString());
+            HttpContext.Session.SetString("Username", user.Name);
+
+            return RedirectToAction("Profile");
         }
 
         [HttpGet]
@@ -120,7 +122,7 @@ namespace WebTest2.Controllers
                     HttpContext.Session.SetString("UserId", user.UserId.ToString());
                     HttpContext.Session.SetString("Username", user.Name);
 
-                    return RedirectToAction("List", "ListPage");
+                    return RedirectToAction("List", "ListPage");                    
                 }
             }
             else
@@ -139,8 +141,181 @@ namespace WebTest2.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            HttpContext.Session.Clear(); // Clear session data
-            return RedirectToAction("Login"); // Redirect to login page
+            HttpContext.Session.Clear();
+            return RedirectToAction("Login");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Profile()
+        {
+            var userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Асинхронный запрос в базу данных
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId.ToString() == userId);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var model = new User
+            {
+                Name = user.Name,
+                Email = user.Email
+            };
+
+            return View(model);
+        }
+
+        //[HttpGet]
+        //public async Task<IActionResult> EditProfile()
+        //{
+        //    var userId = HttpContext.Session.GetString("UserId");
+        //    if (userId == null)
+        //    {
+        //        return RedirectToAction("Login");
+        //    }
+
+        //    // Получаем данные пользователя из базы данных
+        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId.ToString() == userId);
+        //    if (user == null)
+        //    {
+        //        return RedirectToAction("Login");
+        //    }
+
+        //    return View(user); // Возвращаем представление EditProfile с моделью пользователя
+        //}
+
+        //[HttpPost]
+        //public async Task<IActionResult> EditProfile(User model, string? OldPassword, string? NewPassword, string? ConfirmPassword)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return View(model);
+        //    }
+
+        //    // Получаем текущего пользователя из базы данных
+        //    var userId = HttpContext.Session.GetString("UserId");
+        //    if (userId == null)
+        //    {
+        //        return RedirectToAction("Login");
+        //    }
+
+        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId.ToString() == userId);
+        //    if (user == null)
+        //    {
+        //        return RedirectToAction("Login");
+        //    }
+
+        //    // Обновляем данные профиля
+        //    user.Name = model.Name;
+
+        //    // Проверяем, хочет ли пользователь изменить пароль
+        //    if (!string.IsNullOrEmpty(OldPassword) || !string.IsNullOrEmpty(NewPassword) || !string.IsNullOrEmpty(ConfirmPassword))
+        //    {
+        //        // Если указан старый пароль, проверяем его
+        //        if (string.IsNullOrEmpty(OldPassword) || !BCrypt.Net.BCrypt.Verify(OldPassword, user.Password))
+        //        {
+        //            ModelState.AddModelError("WrongOldPass", ErrorMessages.WrongOldPass);
+        //            return View(model);
+        //        }
+
+        //        // Проверяем совпадение нового пароля и его подтверждения
+        //        if (!string.IsNullOrEmpty(NewPassword))
+        //        {
+        //            if (NewPassword != ConfirmPassword)
+        //            {
+        //                ModelState.AddModelError("NewPassword", ErrorMessages.PasswordsDoNotMatch);
+        //                return View(model);
+        //            }
+
+        //            // Хешируем новый пароль и сохраняем его
+        //            user.Password = BCrypt.Net.BCrypt.HashPassword(NewPassword);
+        //        }
+        //    }
+
+        //    // Сохраняем изменения в базе данных
+        //    _context.Users.Update(user);
+        //    await _context.SaveChangesAsync();
+
+        //    return RedirectToAction("Profile");
+        //}
+
+        [HttpGet]
+        public async Task<IActionResult> EditProfile()
+        {
+            // Получаем текущего пользователя
+            var userId = HttpContext.Session.GetString("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId.ToString() == userId);
+            if (user == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Создаем ViewModel
+            var model = new EditProfileDto
+            {
+                UserId = user.UserId,
+                Name = user.Name
+            };
+
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EditProfile(EditProfileDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var user = await _context.Users.FindAsync(model.UserId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            if (user.Name == model.Name)
+            {
+                ModelState.AddModelError(nameof(model.Name), "Вы не изменили имя.");
+                return View(model);
+            }
+
+            // Изменяем имя, если оно было предоставлено
+            if (!string.IsNullOrWhiteSpace(model.Name))
+            {
+                user.Name = model.Name;
+
+                HttpContext.Session.SetString("Username", user.Name);
+            }
+
+            // Проверка на изменение пароля
+            if (!string.IsNullOrEmpty(model.NewPassword) || !string.IsNullOrEmpty(model.ConfirmPassword))
+            {
+                if (string.IsNullOrEmpty(model.OldPassword) ||
+                    !BCrypt.Net.BCrypt.Verify(model.OldPassword, user.Password))
+                {
+                    ModelState.AddModelError(nameof(model.OldPassword), ErrorMessages.WrongOldPass);
+                    return View(model);
+                }
+
+                user.Password = BCrypt.Net.BCrypt.HashPassword(model.NewPassword);              
+            }
+
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Profile");
         }
     }
 }

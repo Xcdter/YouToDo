@@ -1,0 +1,51 @@
+﻿@model YouToDo.DTOs.EditProfileDto
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+
+<h2>Редактирование профиля</h2>
+
+<form asp-action="EditProfile" method="post">
+    <input type="hidden" asp-for="UserId" />
+
+    <!-- Поле для имени -->
+    <div style="margin-bottom: 20px;">
+        <label asp-for="Name">Имя</label>
+        <input asp-for="Name" class="form-control" style="width: 100%;" required />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+
+    <!-- Поле для старого пароля -->
+    <div style="margin-bottom: 20px;">
+        <label for="OldPassword">Старый пароль (только для изменения пароля)</label>
+        <input id="OldPassword" name="OldPassword" type="password" class="form-control" style="width: 100%;" />
+        <span asp-validation-for="OldPassword" class="text-danger"></span>
+    </div>
+
+    <!-- Поле для нового пароля -->
+    <div style="margin-bottom: 20px;">
+        <label for="NewPassword">Новый пароль</label>
+        <input id="NewPassword" name="NewPassword" type="password" class="form-control" style="width: 100%;" disabled />
+        <span asp-validation-for="NewPassword" class="text-danger"></span>
+    </div>
+
+    <!-- Поле для подтверждения нового пароля -->
+    <div style="margin-bottom: 20px;">
+        <label for="ConfirmPassword">Подтвердите новый пароль</label>
+        <input id="ConfirmPassword" name="ConfirmPassword" type="password" class="form-control" style="width: 100%;" disabled />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+    </div>
+
+    <!-- Кнопки управления -->
+    <div style="margin-top: 20px; text-align: left;">
+        <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">Сохранить</button>
+        <a asp-action="Profile" asp-controller="User" class="btn btn-secondary" style="padding: 10px 20px;">Отмена</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script src="~/js/profile-validation.js"></script>
+}
+
+
