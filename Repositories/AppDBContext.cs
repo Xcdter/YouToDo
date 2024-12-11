@@ -21,6 +21,8 @@ namespace YouToDo.Repositories
 
         public DbSet<Project> Projects { get; set; }
 
+        public DbSet<FileModel> Files { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("public");
@@ -84,7 +86,52 @@ namespace YouToDo.Repositories
                 entity.Property(e => e.UserId).HasColumnName("user_id");
             });
 
-            base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<Project>(entity =>
+            {
+                entity.ToTable("Projects");
+
+                entity.Property(e => e.Id).HasColumnName("project_id");
+
+                entity.Property(e => e.Title).HasColumnName("title");
+
+                entity.Property(e => e.Description).HasColumnName("description");
+
+                entity.Property(e => e.CreatedDate).HasColumnName("created_date");
+
+                entity.Property(e => e.UpdatedDate).HasColumnName("updated_date");
+
+                entity.Property(e => e.DueDate).HasColumnName("due_date");
+
+                entity.Property(e => e.UserId).HasColumnName("user_id");
+            });
+
+            modelBuilder.Entity<FileModel>(entity =>
+            {
+                entity.ToTable("Files");
+
+                entity.Property(e => e.Id).HasColumnName("file_id");
+
+                entity.Property(e => e.Name)
+                      .HasColumnName("file_name")
+                      .HasMaxLength(255)
+                      .IsRequired();
+
+                entity.Property(e => e.Type)
+                      .HasColumnName("type")
+                      .HasMaxLength(10)
+                      .IsRequired();
+
+                entity.Property(e => e.Data)
+                      .HasColumnName("file_data")
+                      .IsRequired();
+
+                entity.Property(e => e.TaskId).HasColumnName("task_id");
+
+                entity.HasOne(e => e.Task)
+                      .WithMany(t => t.Files)
+                      .HasForeignKey(e => e.TaskId)
+                      .HasConstraintName("files_task_fk");
+            });
         }
     }
 }

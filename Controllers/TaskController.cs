@@ -25,9 +25,22 @@ namespace YouToDo.Controllers
         }
 
         [HttpGet]
-        public IActionResult ViewTask(int? id)
+        public async Task<IActionResult> ViewTask(int? id)
         {
-            TaskModel task = _context.Tasks.AsNoTracking().FirstOrDefault(t => t.Id == id.Value);
+            if (id == null)
+            {
+                return BadRequest("Task ID is required.");
+            }
+
+            var task = await _context.Tasks
+                .AsNoTracking()
+                .Include(t => t.Files)
+                .FirstOrDefaultAsync(t => t.Id == id.Value);
+
+            if (task == null)
+            {
+                return NotFound($"Task with ID {id} was not found.");
+            }
 
             return View(task);
         }

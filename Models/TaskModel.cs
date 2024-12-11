@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using YouToDo.Filters;
@@ -35,5 +36,7 @@ namespace YouToDo.Models
 
         [ForeignKey("User")]
         public int UserId { get; set; }
+
+        public ICollection<FileModel> Files { get; set; } = new List<FileModel>();
     }
 }

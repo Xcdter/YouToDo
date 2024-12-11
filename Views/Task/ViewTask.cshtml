@@ -53,6 +53,41 @@
             <label>Дата завершения</label>
             <p>@Model.DueDate?.ToString()</p>
         </div>
+
+        <div style="margin-top: 20px;">
+            <label>Files:</label>
+            <div>
+                @if (Model.Files != null && Model.Files.Any())
+                {
+                    <ul>
+                        @foreach (var file in Model.Files)
+                        {
+                            var fileSize = file.Data.Length; // Размер файла в байтах
+                            <li>
+                                <a href="@Url.Action("Download", "File", new { id = file.Id })">@file.Name</a>
+                                (<span>@(string.Format(System.Globalization.CultureInfo.InvariantCulture, "{0:F2} KB", fileSize / 1024.0))</span>)
+                                <form asp-action="Delete" asp-controller="File" method="post" style="display:inline;">
+                                    <input type="hidden" name="id" value="@file.Id" />
+                                    <button type="submit" style="margin-left: 10px;">Delete</button>
+                                </form>
+                            </li>
+                        }
+                    </ul>
+                }
+                else
+                {
+                    <p>No files uploaded.</p>
+                }
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <form asp-action="Upload" asp-controller="File" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="taskId" value="@Model.Id" />
+                <input type="file" name="uploadedFile" style="margin-top: 10px;" />
+                <button type="submit" style="padding: 5px 10px; margin-top: 10px;">Upload</button>
+            </form>
+        </div>
     </div>
 </div>
 
