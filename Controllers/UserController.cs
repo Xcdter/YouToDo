@@ -168,81 +168,7 @@ namespace WebTest2.Controllers
             };
 
             return View(model);
-        }
-
-        //[HttpGet]
-        //public async Task<IActionResult> EditProfile()
-        //{
-        //    var userId = HttpContext.Session.GetString("UserId");
-        //    if (userId == null)
-        //    {
-        //        return RedirectToAction("Login");
-        //    }
-
-        //    // Получаем данные пользователя из базы данных
-        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId.ToString() == userId);
-        //    if (user == null)
-        //    {
-        //        return RedirectToAction("Login");
-        //    }
-
-        //    return View(user); // Возвращаем представление EditProfile с моделью пользователя
-        //}
-
-        //[HttpPost]
-        //public async Task<IActionResult> EditProfile(User model, string? OldPassword, string? NewPassword, string? ConfirmPassword)
-        //{
-        //    if (!ModelState.IsValid)
-        //    {
-        //        return View(model);
-        //    }
-
-        //    // Получаем текущего пользователя из базы данных
-        //    var userId = HttpContext.Session.GetString("UserId");
-        //    if (userId == null)
-        //    {
-        //        return RedirectToAction("Login");
-        //    }
-
-        //    var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId.ToString() == userId);
-        //    if (user == null)
-        //    {
-        //        return RedirectToAction("Login");
-        //    }
-
-        //    // Обновляем данные профиля
-        //    user.Name = model.Name;
-
-        //    // Проверяем, хочет ли пользователь изменить пароль
-        //    if (!string.IsNullOrEmpty(OldPassword) || !string.IsNullOrEmpty(NewPassword) || !string.IsNullOrEmpty(ConfirmPassword))
-        //    {
-        //        // Если указан старый пароль, проверяем его
-        //        if (string.IsNullOrEmpty(OldPassword) || !BCrypt.Net.BCrypt.Verify(OldPassword, user.Password))
-        //        {
-        //            ModelState.AddModelError("WrongOldPass", ErrorMessages.WrongOldPass);
-        //            return View(model);
-        //        }
-
-        //        // Проверяем совпадение нового пароля и его подтверждения
-        //        if (!string.IsNullOrEmpty(NewPassword))
-        //        {
-        //            if (NewPassword != ConfirmPassword)
-        //            {
-        //                ModelState.AddModelError("NewPassword", ErrorMessages.PasswordsDoNotMatch);
-        //                return View(model);
-        //            }
-
-        //            // Хешируем новый пароль и сохраняем его
-        //            user.Password = BCrypt.Net.BCrypt.HashPassword(NewPassword);
-        //        }
-        //    }
-
-        //    // Сохраняем изменения в базе данных
-        //    _context.Users.Update(user);
-        //    await _context.SaveChangesAsync();
-
-        //    return RedirectToAction("Profile");
-        //}
+        }      
 
         [HttpGet]
         public async Task<IActionResult> EditProfile()
@@ -269,7 +195,6 @@ namespace WebTest2.Controllers
 
             return View(model);
         }
-
 
         [HttpPost]
         public async Task<IActionResult> EditProfile(EditProfileDto model)
